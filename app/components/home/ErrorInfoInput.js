@@ -1,16 +1,17 @@
-import { StackActions, useNavigation, useRoute } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import React, { useState, useEffect } from 'react'
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import APIManager from '../../controller/APIManager'
 import Constant from '../../controller/Constant'
-import RNProgressHud from 'progress-hud';
 import PushNotification from "react-native-push-notification";
+import Loading from '../customs/Loading'
 
 const ErrorInfoInput = () => {
 
     const route = useRoute()
+    const [isLoading, setIsLoading] = useState(false)
     const equipmentId = route.params?.id ?? ''
     const equipmentName = route.params?.name || route.params?.title
     const equipmentModel = route.params?.model ?? ''
@@ -40,7 +41,7 @@ const ErrorInfoInput = () => {
     }
 
     const onSuccessed = () => {
-        RNProgressHud.dismiss();
+        setIsLoading(false)
         handleNotification(
             'Gửi yêu cầu báo hỏng thiết bị thành công!',
             'Vui lòng xem chi tiết ở mục thông báo!'
@@ -50,6 +51,7 @@ const ErrorInfoInput = () => {
     }
 
     const onFailed = () => {
+        setIsLoading(false)
         handleNotification(
             'Gửi yêu cầu báo hỏng thiết bị thất bại!',
             'Vui lòng kiểm tra lại!'
@@ -62,17 +64,17 @@ const ErrorInfoInput = () => {
             Alert.alert('Thông báo', 'Vui lòng nhập lý do hỏng!')
             return
         }
-        RNProgressHud.show()
         APIManager.requestError(equipmentId, reason)
             .then(response => {
                 onSuccessed();
                 
             })
             .catch(onFailed)
-            .catch(() => RNProgressHud.dismiss())
+            .catch(() => setIsLoading(false))
     }
 
     return (
+        isLoading ? <Loading /> :
         <SafeAreaView style={styles.rootView}>
             <ScrollView>
                 <Text style={styles.name}>

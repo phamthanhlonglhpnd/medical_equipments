@@ -4,12 +4,11 @@ import { FlatList, StyleSheet, TouchableOpacity, View, Image } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context'
 import APIManager from '../../controller/APIManager'
 import EquipmentItem from './components/EquipmentItem'
-import RNProgressHud from 'progress-hud'
 import ActionSheet from 'react-native-actionsheet'
 import Constant from '../../controller/Constant'
 import SearchInput from '../customs/SearchInput'
 import filter from '../../assets/images/filter.png'
-
+import Loading from '../customs/Loading'
 
 const EquipmentList = () => {
 
@@ -17,10 +16,9 @@ const EquipmentList = () => {
     const navigation = useNavigation()
     const [equipments, setEquipments] = useState([])
     const [keyword, setKeyword] = useState("");
-
+    const [isLoading, setIsLoading] = useState(true)
     const actionSheetRef = useRef(null)
     const equipmentsRoot = useRef([])
-    
     const screen = route.params?.screen ?? ''
 
     const showEquipmentDetails = (equipmentId) => {
@@ -56,14 +54,13 @@ const EquipmentList = () => {
     }
 
     const getAllEquipments = () => {
-        RNProgressHud.show()
         APIManager.getAllEquipments(keyword)
             .then(equipments => {
                 setEquipments(equipments)
                 equipmentsRoot.current = equipments
             })
             .catch(error => alert(error?.message))
-            .finally(() => RNProgressHud.dismiss())
+            .finally(() => setIsLoading(false))
     }
 
     const onSelectFilter = (index) => {
@@ -104,6 +101,7 @@ const EquipmentList = () => {
     }, [])
 
     return (
+        isLoading ? <Loading/> :
         <SafeAreaView style={styles.container}>
             <View
                 style={{

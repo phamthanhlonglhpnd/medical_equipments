@@ -1,34 +1,34 @@
 import { useNavigation } from '@react-navigation/core'
-import React, { useEffect, useLayoutEffect, useState, useCallback } from 'react'
-import { useFocusEffect } from '@react-navigation/native'
-import { StyleSheet } from 'react-native'
+import React, { useLayoutEffect, useState, useEffect } from 'react'
+import { StyleSheet, View } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import APIManager from '../../controller/APIManager'
 import StaffItem from './components/StaffItem'
-import RNProgressHud from 'progress-hud'
+import Loading from '../customs/Loading'
 
 const StaffList = () => {
 
     const navigation = useNavigation()
     const [staffs, setStaffs] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
 
-    const getAllUser = () => {
-        RNProgressHud.show()
+    const getAllUser = async () => {        
         APIManager.getAllUser()
             .then(staffs => setStaffs(staffs))
-            .catch(error => alert(error?.message))
-            .finally(() => RNProgressHud.dismiss())
+            .catch(error => {
+                alert(error?.message)
+            })
+            .finally(() => setIsLoading(false))
     }
 
-    useFocusEffect(
-        useCallback(() => {
+    
+        useEffect(() => {
             getAllUser();
             return () => {
 
             }
         }, [])
-    )
+    
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -43,13 +43,14 @@ const StaffList = () => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        isLoading ? <Loading/> :
+        <View style={styles.container}>
             <FlatList
                 data={staffs}
                 renderItem={renderItem}
                 keyExtractor={(item) => item?.name}
             />
-        </SafeAreaView>
+        </View> 
     )
 }
 
@@ -58,8 +59,8 @@ export default StaffList
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 15,
-        paddingVertical: 15,
         backgroundColor: '#EBF3FE',
         flex: 1,
+        paddingVertical: 20
     },
 })

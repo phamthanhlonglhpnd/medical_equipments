@@ -1,9 +1,9 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View, Image, FlatList } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, Image, FlatList, Alert } from 'react-native'
 import FastImage from 'react-native-fast-image'
 import APIManager from '../../controller/APIManager'
 import Constant from '../../controller/Constant'
-import RNProgressHud from 'progress-hud'
+import Loading from '../customs/Loading'
 import { StackActions, useNavigation, useRoute } from '@react-navigation/native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import logo from '../../assets/images/img_logo.png'
@@ -16,6 +16,7 @@ const EquipmentDetails = () => {
     const [equipment, setEquipment] = useState();
     const [historyInventory, setHistoryInventory] = useState([]);
     const [isActive, setIsActive] = useState(false);
+    const [isLoading, setIsLoading] = useState(true)
 
     const onRequestError = () => {
         navigation.dispatch(
@@ -33,7 +34,6 @@ const EquipmentDetails = () => {
         if (equipmentId === '') {
             return
         }
-        RNProgressHud.show()
         APIManager.getAEquipment(equipmentId)
             .then(equipment => {
                 setEquipment(equipment);
@@ -41,21 +41,26 @@ const EquipmentDetails = () => {
                     setIsActive(true);
                 }
             })
-            .catch(error => alert(error?.message))
-            .finally(() => RNProgressHud.dismiss())
+            .catch(error => {
+                // Alert.alert('Thông báo', error?.message)
+                setIsLoading(false)
+            })
+            .finally(() => setIsLoading(false))
     }
 
     const getHistoryInventory = () => {
         if (equipmentId === '') {
             return
         }
-        RNProgressHud.show()
         APIManager.getInventoryByEquipmentID(equipmentId)
             .then(historyInventory => {
                 setHistoryInventory(historyInventory);
             })
-            .catch(error => alert(error?.message))
-            .finally(() => RNProgressHud.dismiss())
+            .catch(error => {
+                Alert.alert('Thông báo', error?.message)
+                setIsLoading(false)
+            })
+            .finally(() => setIsLoading(false))
     }
 
     useEffect(() => {
@@ -79,8 +84,8 @@ const EquipmentDetails = () => {
 
     const getStatusStyle = (status) => {
         let statusStyle = {
-            backgroundColor: '',
-            statusColor:  ''
+            backgroundColor: 'black',
+            statusColor:  'white'
         }
         
         if(status === 'not_handed' || status === 'active') {
@@ -99,6 +104,7 @@ const EquipmentDetails = () => {
     }
 
     return (
+        isLoading ? <Loading /> :
         <KeyboardAwareScrollView style={styles.rootView}>
             <View style={styles.top}>
                 {
@@ -183,9 +189,6 @@ const EquipmentDetails = () => {
                                 )
                             }}
                             keyExtractor={(item) => item?.id}
-                            // contentContainerStyle={{
-                            //     paddingTop: 12
-                            // }}
                         />
                      :
                     <Text>Thiết bị chưa được kiểm kê</Text>
@@ -225,11 +228,9 @@ const styles = StyleSheet.create({
     top: {
         backgroundColor: 'white',
         marginVertical: 30,
-        // marginHorizontal: 20,
         borderRadius: 50,
         paddingHorizontal: 20,
         paddingVertical: 10
-
     },
     image: {
         width: 110,
@@ -277,10 +278,10 @@ const styles = StyleSheet.create({
     },
     boxStatus: {
         borderRadius: 15,
-        width: 125,
+        width: 135,
         paddingVertical: 8,
         marginVertical: 10,
-        marginHorizontal: ( Constant.screen.width - 125 ) / 2 - 125/4
+        marginHorizontal: ( Constant.screen.width - 125 ) / 2 - 125 / 4
     },
     status: {
         fontWeight: 'bold',

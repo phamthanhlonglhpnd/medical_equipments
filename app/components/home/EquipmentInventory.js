@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, Alert, FlatList } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import Constant from '../../controller/Constant'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { StackActions, useNavigation } from '@react-navigation/native'
-import RNProgressHud from 'progress-hud'
 import APIManager from '../../controller/APIManager'
 import EquipmentItem from './components/EquipmentItem'
+import Loading from '../customs/Loading'
 
 const EquipmentInventory = () => {
 
@@ -14,13 +13,13 @@ const EquipmentInventory = () => {
     const [equipments, setEquipments] = useState([]);
     const [keyword, setKeyword] = useState('');
     const [isRemind, setIsRemind] = useState(true);
+    const [isLoading, setIsLoading] = useState(false)
 
     const onSearch = () => {
         if (keyword === '') {
             Alert.alert('Thông báo', 'Vui lòng nhập thông tin để tìm kiếm!')
             return
         }
-        RNProgressHud.show()
         APIManager.getAllEquipments(keyword)
             .then(equipments => {
                 let newEquipments = [];
@@ -38,10 +37,11 @@ const EquipmentInventory = () => {
                 setKeyword("");
             })
             .catch(error => {
-                alert(error?.message);
+                Alert.alert('Thông báo', error?.message);
                 setKeyword("")
+                setIsLoading(false)
             })
-            .finally(() => RNProgressHud.dismiss())
+            .finally(() => setIsLoading(false))
     }
 
     const showImageScanner = () => {
@@ -67,8 +67,9 @@ const EquipmentInventory = () => {
     }
 
     return (
+        isLoading ? <Loading /> :
         equipments.length === 0 ? 
-        <SafeAreaView style={{ flex: 1 }}>
+        <View style={styles.container}>
             <Text style={styles.title}>
                 Nhập để tìm thiết bị cần kiểm kê
             </Text>
@@ -105,8 +106,8 @@ const EquipmentInventory = () => {
                     style={styles.qrCodeIcon}
                 />
             </TouchableOpacity>
-        </SafeAreaView> : 
-        <SafeAreaView style={{ flex: 1}}>
+        </View> : 
+        <View style={{ flex: 1}}>
             <Text 
                 style={[
                     styles.title,
@@ -125,13 +126,19 @@ const EquipmentInventory = () => {
                     paddingTop: 12
                 }}
             />
-        </SafeAreaView>
+        </View>
     )
 }
 
 export default EquipmentInventory
 
 const styles = StyleSheet.create({
+    container: {
+        paddingHorizontal: 15,
+        backgroundColor: '#EBF3FE',
+        flex: 1,
+        paddingVertical: 20
+    },
     title: {
         alignSelf: 'center',
         marginTop: 20,

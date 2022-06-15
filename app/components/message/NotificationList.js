@@ -1,35 +1,47 @@
-import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React, { useState, useCallback, useEffect } from 'react'
+import { useFocusEffect } from '@react-navigation/native'
+import { StyleSheet, View, Alert } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import NotificationItem from './NotificationItem'
-import RNProgressHud from 'progress-hud'
 import APIManager from '../../controller/APIManager'
-// import StorageManager from '../../controller/StorageManager'
-// import Constant from '../../controller/Constant'
+import Loading from '../customs/Loading'
+import { useDispatch } from 'react-redux'
+import { resetCount } from '../../store/slice/appSlice'
 
-const NotificationList = () => {
+const NotificationList = ({ navigation }) => {
 
     const [notificationList, setNotificationList] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
+    const dispatch = useDispatch()
     
+    const getAllNotification = () => {
+        APIManager.getAllNotification()
+            .then(notification => {
+                setNotificationList(notification)
+            })
+            .catch(error => {
+                Alert.alert('Thông báo', error?.message)
+                setIsLoading(false)
+            })
+            .finally(() => setIsLoading(false))
+    }
+
+    useFocusEffect(
+        useCallback(() => {
+            getAllNotification()
+            return () => {
+
+            }
+        }, [])
+    )
+
     useEffect(() => {
-        const getAllNotification = () => {
-            RNProgressHud.show()
-            APIManager.getAllNotification()
-                .then(notification => {
-                    setNotificationList(notification)
-                    // StorageManager.setData(Constant.keys.count, notification.length)
-                })
-                .catch(error => alert(error?.message))
-                .finally(() => RNProgressHud.dismiss())
-        }
-
-        getAllNotification();
-        
-        return () => {
-
-        }
-    }, [])
+        const unsubscribe = navigation.addListener('tabPress', (e) => {
+            dispatch(resetCount())
+        });
+    
+        return unsubscribe;
+      }, [navigation]);
 
     const renderItem = ({ item }) => {
         return (
@@ -38,14 +50,15 @@ const NotificationList = () => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        isLoading ? <Loading /> :
+        <View style={styles.container}>
             <FlatList
                 data={notificationList}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={styles.flatListContent}
             />
-        </SafeAreaView>
+        </View>
     )
 }
 
@@ -54,9 +67,7 @@ export default NotificationList
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F2F6FE'
+        backgroundColor: '#F2F6FE',
+        paddingVertical: 20
     },
-    flatListContent: {
-        paddingTop: 12
-    }
 })

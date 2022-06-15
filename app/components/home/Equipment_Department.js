@@ -1,25 +1,25 @@
 import { useNavigation, useRoute, StackActions } from '@react-navigation/core'
 import React, { useState, useCallback } from 'react'
 import { useFocusEffect } from '@react-navigation/native'
-import { FlatList, StyleSheet, Text, View } from 'react-native'
+import { FlatList, StyleSheet, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import APIManager from '../../controller/APIManager'
-import RNProgressHud from 'progress-hud'
 import EquipmentItem from './components/EquipmentItem'
 import Constant from '../../controller/Constant'
+import Loading from '../customs/Loading'
 
 const DepartmentList = () => {
 
     const navigation = useNavigation()
     const route = useRoute();
     const [equipments, setEquipments] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
 
     const getAllEquipments = () => {
-        RNProgressHud.show()
         APIManager.getAllEquipmentsByDepartment(route.params.id)
             .then(equipments => setEquipments(equipments))
             .catch(error => alert(error?.message))
-            .finally(() => RNProgressHud.dismiss())
+            .finally(() => setIsLoading(false))
     }
 
     const goToInventory = (title, id, model, serial) => {
@@ -47,6 +47,7 @@ const DepartmentList = () => {
     }
 
     return (
+        isLoading ? <Loading/> :
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>{route.params.title}</Text>
             <FlatList 

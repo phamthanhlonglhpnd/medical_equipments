@@ -1,22 +1,22 @@
 import { useNavigation } from '@react-navigation/core';
 import React, {useState, useEffect} from 'react'
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import FormInput from '../../components/customs/FormInput';
 import { validateEmail, validatePassword } from '../../controller/validate';
 import APIManager from '../../controller/APIManager';
 import hospitalLogo from '../../assets/images/kienan.jpg';
-import RNProgressHud from 'progress-hud';
 import Constant from '../../controller/Constant'
-
+import Loading from '../customs/Loading';
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [isShowPassword, setIsShowPassword] = useState(false);
+  const [isShowPassword, setIsShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const navigation = useNavigation();
 
@@ -27,11 +27,13 @@ export default function Login() {
     }
 
     const onTapLogin = () => {
-        RNProgressHud.show()
+        setIsLoading(true)
         APIManager.login(email, password)
             .then(showHomeScreen)
-            .catch(error => alert(error?.message))
-            .finally(() => RNProgressHud.dismiss())
+            .catch(error => {
+              Alert.alert('Thông báo', error?.message)
+              setIsLoading(false)
+            })
     }
 
     useEffect(() => {
@@ -41,6 +43,7 @@ export default function Login() {
     }, [navigation])
 
   return (
+    isLoading ? <Loading /> :
     <KeyboardAwareScrollView style={styles.container}>
       <Image
         source={hospitalLogo}
@@ -124,7 +127,8 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    marginVertical: 30
   },
   image: {
     width: 150,

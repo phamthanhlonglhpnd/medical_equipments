@@ -5,12 +5,13 @@ import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import APIManager from '../../controller/APIManager'
 import Constant from '../../controller/Constant'
-import RNProgressHud from 'progress-hud';
 import PushNotification from "react-native-push-notification";
+import Loading from '../customs/Loading'
 
 const EquipmentInventoryInput = () => {
 
     const route = useRoute()
+    const [isLoading, setIsLoading] = useState(false)
     const equipmentId = route.params?.id ?? ''
     const equipmentName = route.params?.name || route.params?.title
     const equipmentModel = route.params?.model ?? ''
@@ -40,7 +41,7 @@ const EquipmentInventoryInput = () => {
     }
 
     const onSuccessed = () => {
-        RNProgressHud.dismiss();
+        setIsLoading(false)
         handleNotification(
             'Gửi ghi chú kiểm kê thiết bị thành công!',
             'Vui lòng xem chi tiết ở mục lịch sử kiểm kê của thiết bị!'
@@ -50,6 +51,7 @@ const EquipmentInventoryInput = () => {
     }
 
     const onFailed = () => {
+        setIsLoading(false)
         handleNotification(
             'Gửi yêu cầu kiểm kê thiết bị thất bại!',
             'Vui lòng kiểm tra lại!'
@@ -62,17 +64,18 @@ const EquipmentInventoryInput = () => {
             Alert.alert('Thông báo', 'Vui lòng nhập ghi chú kiểm kê!')
             return
         }
-        RNProgressHud.show()
+        setIsLoading(true)
         APIManager.requestInventory(equipmentId, note)
             .then(response => {
                 onSuccessed();
                 
             })
             .catch(onFailed)
-            .catch(() => RNProgressHud.dismiss())
+            .catch(() => setIsLoading(false))
     }
 
     return (
+        isLoading ? <Loading /> :
         <SafeAreaView style={styles.rootView}>
             <ScrollView>
                 <Text style={styles.name}>

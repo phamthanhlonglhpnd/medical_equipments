@@ -7,11 +7,14 @@ import Home from '../home/Home';
 import Profile from '../profile/Profile';
 import NotificationList from '../message/NotificationList';
 import Scan from '../scan/Scan';
-import StorageManager from '../../controller/StorageManager';
+import { useSelector } from 'react-redux';
+import { selectCount } from '../../store/slice/appSlice';
 
 const Tab = createBottomTabNavigator();
 
 const TabBarNavigation = () => {
+
+    const count = useSelector(selectCount)
 
     return (
         <Tab.Navigator
@@ -36,10 +39,14 @@ const TabBarNavigation = () => {
                 tabBarStyle: {
                     backgroundColor: 'white',
                     borderTopWidth: 0,
-
+                    height: 65,
+                    paddingBottom: 5
                 },
-                tabBarShowLabel: false,
-                tabBarActiveTintColor: Constant.color.second,
+                tabBarShowLabel: true,
+                tabBarLabelStyle: {
+                    fontSize: 13
+                },
+                tabBarActiveTintColor: Constant.color.main,
                 headerStyle: {
                     elevation: 0,
                     shadowOpacity: 0,
@@ -58,6 +65,7 @@ const TabBarNavigation = () => {
                 component={NotificationList}
                 options={{
                     title: 'Thông báo',
+                    tabBarBadge: count
                 }}
             />
             <Tab.Screen

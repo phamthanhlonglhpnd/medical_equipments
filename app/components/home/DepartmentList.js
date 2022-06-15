@@ -1,33 +1,30 @@
 import { useNavigation } from '@react-navigation/core'
-import React, { useEffect, useLayoutEffect, useState, useCallback } from 'react'
-import { useFocusEffect } from '@react-navigation/native'
-import { FlatList, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
+import { FlatList, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import APIManager from '../../controller/APIManager'
-import RNProgressHud from 'progress-hud'
 import DepartmentItem from './components/DepartmentItem'
+import Loading from '../customs/Loading'
 
 const DepartmentList = () => {
 
     const navigation = useNavigation()
     const [departments, setDepartments] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
 
-    const getAllDepartments = () => {
-        RNProgressHud.show()
+    const getAllDepartments = () => { 
         APIManager.getAllDepartments()
             .then(departments => setDepartments(departments))
             .catch(error => alert(error?.message))
-            .finally(() => RNProgressHud.dismiss())
+            .finally(() => setIsLoading(false))
     }
-
-    useFocusEffect(
-        useCallback(() => {
+        useEffect(() => {
             getAllDepartments()
             return () => {
 
             }
         }, [])
-    )
+    
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -42,6 +39,7 @@ const DepartmentList = () => {
     }
 
     return (
+        isLoading ? <Loading/> :
         <SafeAreaView style={{ flex: 1 }}>
             <FlatList
                 data={departments}

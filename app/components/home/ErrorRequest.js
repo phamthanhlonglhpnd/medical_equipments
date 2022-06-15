@@ -1,13 +1,11 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, Alert, FlatList } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import Constant from '../../controller/Constant'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { StackActions, useNavigation } from '@react-navigation/native'
-import RNProgressHud from 'progress-hud'
 import APIManager from '../../controller/APIManager'
 import EquipmentItem from './components/EquipmentItem'
-import { format } from 'date-fns'
+import Loading from '../customs/Loading'
 
 const ErrorRequest = () => {
 
@@ -15,13 +13,14 @@ const ErrorRequest = () => {
     const [equipments, setEquipments] = useState([]);
     const [keyword, setKeyword] = useState('');
     const [isRemind, setIsRemind] = useState(true);
+    const [isLoading, setIsLoading] = useState(false)
 
     const onSearch = () => {
         if (keyword === '') {
             Alert.alert('Thông báo', 'Vui lòng nhập thông tin để tìm kiếm!')
             return
         }
-        RNProgressHud.show()
+        setIsLoading(true)
         APIManager.getAllEquipments(keyword)
             .then(equipments => {
                 let newEquipments = [];
@@ -39,10 +38,11 @@ const ErrorRequest = () => {
                 setKeyword("");
             })
             .catch(error => {
-                alert(error?.message);
+                Alert.alert('Thông báo', error?.message);
                 setKeyword("")
+                setIsLoading(false)
             })
-            .finally(() => RNProgressHud.dismiss())
+            .finally(() => setIsLoading(false))
     }
 
     const showImageScanner = () => {
@@ -68,8 +68,9 @@ const ErrorRequest = () => {
     }
 
     return (
+        isLoading ? <Loading /> :
         equipments.length === 0 ? 
-        <SafeAreaView style={{ flex: 1 }}>
+        <View style={styles.container}>
             <Text style={styles.title}>
                 Nhập để tìm thiết bị cần báo hỏng
             </Text>
@@ -106,8 +107,8 @@ const ErrorRequest = () => {
                     style={styles.qrCodeIcon}
                 />
             </TouchableOpacity>
-        </SafeAreaView> : 
-        <SafeAreaView style={{ flex: 1}}>
+        </View> : 
+        <View style={{ flex: 1}}>
             <Text 
                 style={[
                     styles.title,
@@ -126,13 +127,19 @@ const ErrorRequest = () => {
                     paddingTop: 12
                 }}
             />
-        </SafeAreaView>
+        </View>
     )
 }
 
 export default ErrorRequest
 
 const styles = StyleSheet.create({
+    container: {
+        paddingHorizontal: 15,
+        backgroundColor: '#EBF3FE',
+        flex: 1,
+        paddingVertical: 20
+    },
     title: {
         alignSelf: 'center',
         marginTop: 20,
