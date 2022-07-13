@@ -46,6 +46,7 @@ export default {
         Profile: 'Cá nhân',
         Settings: 'Settings',
         Message: 'Message',
+        Drawer: 'Drawer',
         Login: 'Login',
         OnBoarding: "OnBoarding",
         EquipmentList: 'EquipmentList',
@@ -78,6 +79,8 @@ export default {
         isOpened: 'isOpened',
         currentUser: 'currentUser',
         count: 'count',
+        department: 'department',
+        domain: 'domain'
     },
     homeData: [
         {
@@ -179,6 +182,48 @@ export default {
         {
             key: 'liquidated',
             value: 'Đã thanh lý'
+        }
+    ],
+    domains: [
+        {
+            id: 1,
+            value: "http://bv.qltbyt.com",
+            img: ""
+        },
+        {
+            id: 2,
+            value: "http://bvkienanhp.qltbyt.com",
+            img: ""
+        },
+        {
+            id: 3,
+            value: "http://bvdemo.qltbyt.com",
+            img: ""
+        },
+        {
+            id: 4,
+            value: "http://bvcuchi.qltbyt.com",
+            img: ""
+        },
+        {
+            id: 5,
+            value: "http://bme.qltbyt.com",
+            img: ""
+        },
+        {
+            id: 6,
+            value: "http://bvnhihp.qltbyt.com",
+            img: ""
+        },
+        {
+            id: 7,
+            value: "http://bvdakhoatinhthaibinh.qltbyt.com",
+            img: ""
+        },
+        {
+            id: 8,
+            value: "http://bvungbuou.qltbyt.com",
+            img: ""
         }
     ]
 }

@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react'
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import APIManager from '../../controller/APIManager'
 import Constant from '../../controller/Constant'
 import PushNotification from "react-native-push-notification";
 import Loading from '../customs/Loading'
@@ -21,6 +20,9 @@ const ErrorInfoInput = () => {
 
     useEffect(() => {
         createChannels();
+        return () => {
+
+        }
     }, [])
 
     const createChannels = () => {
@@ -59,18 +61,23 @@ const ErrorInfoInput = () => {
         setReason("");
     }
 
-    const requestError = () => {
+    const requestError = async () => {
         if (reason === '') {
             Alert.alert('Thông báo', 'Vui lòng nhập lý do hỏng!')
             return
         }
-        APIManager.requestError(equipmentId, reason)
-            .then(response => {
-                onSuccessed();
-                
-            })
-            .catch(onFailed)
-            .catch(() => setIsLoading(false))
+        setIsLoading(true)
+        dispatch(asyncIncrementCount())
+        try {
+            let domain = await StorageManager.getData(Constant.keys.domain);
+            await requestErrorAPI(domain, equipmentId, reason);
+            onSuccessed();
+            setIsLoading(false)
+        } catch (error) {
+            Alert.alert('Thông báo', error?.message);
+            onFailed();
+            setIsLoading(false)
+        }
     }
 
     return (

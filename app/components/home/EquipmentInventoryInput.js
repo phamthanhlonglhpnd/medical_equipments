@@ -1,9 +1,8 @@
-import { StackActions, useNavigation, useRoute } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import React, { useState, useEffect } from 'react'
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import APIManager from '../../controller/APIManager'
 import Constant from '../../controller/Constant'
 import PushNotification from "react-native-push-notification";
 import Loading from '../customs/Loading'
@@ -21,6 +20,9 @@ const EquipmentInventoryInput = () => {
 
     useEffect(() => {
         createChannels();
+        return () => {
+            
+        }
     }, [])
 
     const createChannels = () => {
@@ -59,19 +61,22 @@ const EquipmentInventoryInput = () => {
         setNote("");
     }
 
-    const requestInventory = () => {
+    const requestInventory = async () => {
         if (note === '') {
             Alert.alert('Thông báo', 'Vui lòng nhập ghi chú kiểm kê!')
             return
         }
         setIsLoading(true)
-        APIManager.requestInventory(equipmentId, note)
-            .then(response => {
-                onSuccessed();
-                
-            })
-            .catch(onFailed)
-            .catch(() => setIsLoading(false))
+        try {
+            let domain = await StorageManager.getData(Constant.keys.domain);
+            await requestInventoryAPI(domain, equipmentId, note);
+            onSuccessed();
+            setIsLoading(false)
+        } catch (error) {
+            Alert.alert('Thông báo', error?.message);
+            onFailed();
+            setIsLoading(false)
+        }
     }
 
     return (

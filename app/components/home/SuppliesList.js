@@ -1,9 +1,11 @@
 import { useNavigation } from '@react-navigation/core'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { FlatList, StyleSheet, View, Alert } from 'react-native'
-import APIManager from '../../controller/APIManager'
 import EquipmentItem from './components/EquipmentItem'
 import Loading from '../customs/Loading'
+import StorageManager from '../../controller/StorageManager'
+import { getAllSuppliesAPI } from '../../controller/APIService'
+import Constant from '../../controller/Constant'
 
 const SuppliesList = () => {
 
@@ -11,14 +13,16 @@ const SuppliesList = () => {
     const [supplies, setSupplies] = useState([])
     const [isLoading, setIsLoading] = useState(true)
 
-    const getAllEquipments = () => {
-        APIManager.getAllSupplies()
-            .then(supplies => setSupplies(supplies))
-            .catch(error => {
-                Alert.alert('Thông báo', error?.message)
-                setIsLoading(false)
-            })
-            .finally(() => setIsLoading(false))
+    const getAllEquipments = async () => {
+        try {
+            let domain = await StorageManager.getData(Constant.keys.domain);
+            let response = await getAllSuppliesAPI(domain);
+            setSupplies(response);
+            setIsLoading(false);
+        } catch (error) {
+            Alert.alert('Thông báo', error?.message);
+            setIsLoading(false);
+        }
     }
 
     useEffect(() => {
@@ -39,12 +43,11 @@ const SuppliesList = () => {
 
     return (
         isLoading ? <Loading /> :
-        <View style={{ flex: 1 }}>
+        <View style={styles.container}>
             <FlatList
                 data={supplies}
                 renderItem={renderItem}
                 keyExtractor={(item) => item?.id}
-                contentContainerStyle={styles.container}
             />
         </View>
     )

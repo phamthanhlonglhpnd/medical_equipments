@@ -1,12 +1,13 @@
 import { useNavigation, useRoute, StackActions } from '@react-navigation/core'
 import React, { useState, useCallback } from 'react'
 import { useFocusEffect } from '@react-navigation/native'
-import { FlatList, StyleSheet, Text } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import APIManager from '../../controller/APIManager'
+import { FlatList, StyleSheet, Text, View, Alert } from 'react-native'
 import EquipmentItem from './components/EquipmentItem'
 import Constant from '../../controller/Constant'
 import Loading from '../customs/Loading'
+import StorageManager from '../../controller/StorageManager'
+import { getAllEquipmentsByDepartmentAPI } from '../../controller/APIService'
+
 
 const DepartmentList = () => {
 
@@ -15,11 +16,19 @@ const DepartmentList = () => {
     const [equipments, setEquipments] = useState([])
     const [isLoading, setIsLoading] = useState(true)
 
-    const getAllEquipments = () => {
-        APIManager.getAllEquipmentsByDepartment(route.params.id)
-            .then(equipments => setEquipments(equipments))
-            .catch(error => alert(error?.message))
-            .finally(() => setIsLoading(false))
+    const getAllEquipments = async () => {
+        try {
+            let domain = await StorageManager.getData(Constant.keys.domain);
+            let response = await getAllEquipmentsByDepartmentAPI(domain, route.params.id);
+            if (!response) {
+                setEquipments([]);
+            }
+            setEquipments(response);
+            setIsLoading(false);
+        } catch (error) {
+            Alert.alert('Thông báo', error?.message);
+            setIsLoading(false);
+        }
     }
 
     const goToInventory = (title, id, model, serial) => {
@@ -47,8 +56,8 @@ const DepartmentList = () => {
     }
 
     return (
-        isLoading ? <Loading/> :
-        <SafeAreaView style={styles.container}>
+        isLoading ? <Loading /> :
+        <View style={styles.container}>
             <Text style={styles.title}>{route.params.title}</Text>
             <FlatList 
                 data={equipments}
@@ -58,7 +67,7 @@ const DepartmentList = () => {
                     paddingTop: 12
                 }}
             />
-        </SafeAreaView>
+        </View>
     )
 }
 
@@ -67,8 +76,7 @@ export default DepartmentList
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 10,
-        paddingVertical: 10, 
-        paddingBottom: 40,
+        paddingVertical: 20, 
         backgroundColor: '#F2F6FE'
     },
     title: {

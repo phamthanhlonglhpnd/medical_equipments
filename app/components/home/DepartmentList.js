@@ -1,10 +1,12 @@
 import { useNavigation } from '@react-navigation/core'
-import React, { useEffect, useLayoutEffect, useState } from 'react'
-import { FlatList, StyleSheet } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import APIManager from '../../controller/APIManager'
+import React, { useLayoutEffect, useState, useCallback } from 'react'
+import { useFocusEffect } from '@react-navigation/native'
+import { FlatList, StyleSheet, Alert, View } from 'react-native'
 import DepartmentItem from './components/DepartmentItem'
 import Loading from '../customs/Loading'
+import StorageManager from '../../controller/StorageManager'
+import Constant from '../../controller/Constant'
+import { getAllDepartmentsAPI } from '../../controller/APIService'
 
 const DepartmentList = () => {
 
@@ -12,19 +14,26 @@ const DepartmentList = () => {
     const [departments, setDepartments] = useState([])
     const [isLoading, setIsLoading] = useState(true)
 
-    const getAllDepartments = () => { 
-        APIManager.getAllDepartments()
-            .then(departments => setDepartments(departments))
-            .catch(error => alert(error?.message))
-            .finally(() => setIsLoading(false))
+    const getAllDepartments = async () => {
+        try {
+            let domain = await StorageManager.getData(Constant.keys.domain);
+            let response = await getAllDepartmentsAPI(domain);
+            setDepartments(response);
+            setIsLoading(false);
+        } catch (error) {
+            Alert.alert('Thông báo', error?.message);
+            setIsLoading(false);
+        }
     }
-        useEffect(() => {
+
+    useFocusEffect(
+        useCallback(() => {
             getAllDepartments()
             return () => {
 
             }
         }, [])
-    
+    )
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -39,15 +48,14 @@ const DepartmentList = () => {
     }
 
     return (
-        isLoading ? <Loading/> :
-        <SafeAreaView style={{ flex: 1 }}>
+        isLoading ? <Loading /> :
+        <View style={styles.container}>
             <FlatList
                 data={departments}
                 renderItem={renderItem}
                 keyExtractor={(item) => item?.id}
-                contentContainerStyle={styles.container}
             />
-        </SafeAreaView>
+        </View>
     )
 }
 
@@ -55,8 +63,9 @@ export default DepartmentList
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 20,
-        paddingVertical: 20, 
-        backgroundColor: '#F2F6FE'
+        paddingHorizontal: 15,
+        backgroundColor: '#EBF3FE',
+        flex: 1,
+        paddingVertical: 20
     },
 })

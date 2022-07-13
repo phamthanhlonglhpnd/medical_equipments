@@ -1,14 +1,15 @@
 import { useNavigation, useRoute, StackActions } from '@react-navigation/core'
 import React, { useLayoutEffect, useRef, useState, useEffect } from 'react'
-import { FlatList, StyleSheet, TouchableOpacity, View, Image } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import APIManager from '../../controller/APIManager'
+import { FlatList, StyleSheet, TouchableOpacity, View, Image, Alert } from 'react-native'
 import EquipmentItem from './components/EquipmentItem'
 import ActionSheet from 'react-native-actionsheet'
 import Constant from '../../controller/Constant'
 import SearchInput from '../customs/SearchInput'
 import filter from '../../assets/images/filter.png'
 import Loading from '../customs/Loading'
+import StorageManager from '../../controller/StorageManager'
+import { getAllEquipmentsAPI } from '../../controller/APIService'
+
 
 const EquipmentList = () => {
 
@@ -53,14 +54,20 @@ const EquipmentList = () => {
         }
     }
 
-    const getAllEquipments = () => {
-        APIManager.getAllEquipments(keyword)
-            .then(equipments => {
-                setEquipments(equipments)
-                equipmentsRoot.current = equipments
-            })
-            .catch(error => alert(error?.message))
-            .finally(() => setIsLoading(false))
+    const getAllEquipments = async () => {
+        try {
+            let domain = await StorageManager.getData(Constant.keys.domain);
+            let response = await getAllEquipmentsAPI(domain, keyword);
+            if (!response) {
+                setEquipments([]);
+            }
+            setEquipments(response);
+            equipmentsRoot.current = response;
+            setIsLoading(false);
+        } catch (error) {
+            Alert.alert('Thông báo', error?.message);
+            setIsLoading(false);
+        }
     }
 
     const onSelectFilter = (index) => {
@@ -101,8 +108,8 @@ const EquipmentList = () => {
     }, [])
 
     return (
-        isLoading ? <Loading/> :
-        <SafeAreaView style={styles.container}>
+        isLoading ? <Loading /> :
+        <View style={styles.container}>
             <View
                 style={{
                     marginHorizontal: 10
@@ -128,7 +135,7 @@ const EquipmentList = () => {
                 cancelButtonIndex={7}
                 onPress={onSelectFilter}
             />
-        </SafeAreaView>
+        </View>
     )
 }
 
@@ -137,7 +144,8 @@ export default EquipmentList
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#EBF3FE'
+        backgroundColor: '#EBF3FE',
+        paddingTop: 20
     },
     filter: {
         height: 30,

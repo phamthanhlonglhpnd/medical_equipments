@@ -1,12 +1,13 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View, Image, FlatList, Alert } from 'react-native'
 import FastImage from 'react-native-fast-image'
-import APIManager from '../../controller/APIManager'
 import Constant from '../../controller/Constant'
 import Loading from '../customs/Loading'
 import { StackActions, useNavigation, useRoute } from '@react-navigation/native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import logo from '../../assets/images/img_logo.png'
+import StorageManager from '../../controller/StorageManager'
+import { getAEquipmentAPI, getInventoryByEquipmentIdAPI } from '../../controller/APIService'
 
 const EquipmentDetails = () => {
 
@@ -30,37 +31,37 @@ const EquipmentDetails = () => {
         )
     }
 
-    const getAEquipment = () => {
+    const getAEquipment = async () => {
         if (equipmentId === '') {
             return
         }
-        APIManager.getAEquipment(equipmentId)
-            .then(equipment => {
-                setEquipment(equipment);
-                if(equipment?.status === "active") {
-                    setIsActive(true);
-                }
-            })
-            .catch(error => {
-                // Alert.alert('Thông báo', error?.message)
-                setIsLoading(false)
-            })
-            .finally(() => setIsLoading(false))
+        try {
+            let domain = await StorageManager.getData(Constant.keys.domain);
+            let response = await getAEquipmentAPI(domain, equipmentId);
+            if(response?.status === "active") {
+                setIsActive(true);
+            }
+            setEquipment(response);
+            setIsLoading(false);
+        } catch (error) {
+            Alert.alert('Thông báo', error?.message);
+            setIsLoading(false);
+        }
     }
 
-    const getHistoryInventory = () => {
+    const getHistoryInventory = async () => {
         if (equipmentId === '') {
             return
         }
-        APIManager.getInventoryByEquipmentID(equipmentId)
-            .then(historyInventory => {
-                setHistoryInventory(historyInventory);
-            })
-            .catch(error => {
-                Alert.alert('Thông báo', error?.message)
-                setIsLoading(false)
-            })
-            .finally(() => setIsLoading(false))
+        try {
+            let domain = await StorageManager.getData(Constant.keys.domain);
+            let response = await getInventoryByEquipmentIdAPI(domain, equipmentId);
+            setHistoryInventory(response);
+            setIsLoading(false);
+        } catch (error) {
+            Alert.alert('Thông báo', error?.message);
+            setIsLoading(false);
+        }
     }
 
     useEffect(() => {
@@ -163,7 +164,7 @@ const EquipmentDetails = () => {
                         <Text style={styles.value}>{equipment?.manufacturer}</Text>
                     </View>
                     <View>
-                        <Text style={styles.title}>Xuất sứ</Text>
+                        <Text style={styles.title}>Xuất xứ</Text>
                         <Text style={styles.value}>{equipment?.origin}</Text>
                     </View>
                 </View>
