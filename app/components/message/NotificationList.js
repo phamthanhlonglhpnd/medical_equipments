@@ -4,18 +4,15 @@ import { StyleSheet, View, Alert } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
 import NotificationItem from './NotificationItem'
 import Loading from '../customs/Loading'
-import { useDispatch } from 'react-redux'
-import { resetCount } from '../../store/slice/appSlice'
 import StorageManager from '../../controller/StorageManager'
 import Constant from '../../controller/Constant'
 import { getAllNotificationAPI } from '../../controller/APIService'
 
-const NotificationList = ({ navigation }) => {
+const NotificationList = () => {
 
     const [notificationList, setNotificationList] = useState([])
     const [isLoading, setIsLoading] = useState(true)
-    const dispatch = useDispatch()
-    
+
     const getAllNotification = async () => {
         try {
             let domain = await StorageManager.getData(Constant.keys.domain);
@@ -37,14 +34,6 @@ const NotificationList = ({ navigation }) => {
         }, [])
     )
 
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('tabPress', (e) => {
-            dispatch(resetCount())
-        });
-    
-        return unsubscribe;
-      }, [navigation]);
-
     const renderItem = ({ item }) => {
         return (
             <NotificationItem item={item} />
@@ -53,14 +42,14 @@ const NotificationList = ({ navigation }) => {
 
     return (
         isLoading ? <Loading /> :
-        <View style={styles.container}>
-            <FlatList
-                data={notificationList}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={styles.flatListContent}
-            />
-        </View>
+            <View style={styles.container}>
+                <FlatList
+                    data={notificationList}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={styles.flatListContent}
+                />
+            </View>
     )
 }
 

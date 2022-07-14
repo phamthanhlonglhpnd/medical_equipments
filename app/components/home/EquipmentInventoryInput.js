@@ -4,8 +4,10 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Constant from '../../controller/Constant'
-import PushNotification from "react-native-push-notification";
+import PushNotification from "react-native-push-notification"
 import Loading from '../customs/Loading'
+import StorageManager from '../../controller/StorageManager'
+import { requestInventoryAPI } from '../../controller/APIService'
 
 const EquipmentInventoryInput = () => {
 
@@ -21,7 +23,7 @@ const EquipmentInventoryInput = () => {
     useEffect(() => {
         createChannels();
         return () => {
-            
+
         }
     }, [])
 
@@ -81,41 +83,41 @@ const EquipmentInventoryInput = () => {
 
     return (
         isLoading ? <Loading /> :
-        <SafeAreaView style={styles.rootView}>
-            <ScrollView>
-                <Text style={styles.name}>
-                    {equipmentName}
-                </Text>
-                <View 
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-evenly',
-                        marginHorizontal: 20,
-                        marginTop: 10
-                    }}
-                >
-                    <Text style={{color: Constant.color.text}}><Text style={{fontWeight: 'bold'}}>Model: </Text>{equipmentModel}</Text>
-                    <Text style={{color: Constant.color.text}}><Text style={{fontWeight: 'bold'}}>Serial: </Text>{equipmentSerial}</Text>
-                </View>
-                <View style={styles.noteView}>
-                    <TextInput
-                        style={styles.noteInput}
-                        value={note}
-                        multiline
-                        onChangeText={text => setNote(text)}
-                        placeholder='Nhập ghi chú kiểm kê tại đây...'
-                    />
-                </View>
-
-                <TouchableOpacity
-                    onPress={requestInventory}
-                    style={styles.requestTouch}>
-                    <Text style={styles.requestText}>
-                        Kiểm kê
+            <SafeAreaView style={styles.rootView}>
+                <ScrollView>
+                    <Text style={styles.name}>
+                        {equipmentName}
                     </Text>
-                </TouchableOpacity>
-            </ScrollView>
-        </SafeAreaView>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-evenly',
+                            marginHorizontal: 20,
+                            marginTop: 10
+                        }}
+                    >
+                        <Text style={{ color: Constant.color.text }}><Text style={{ fontWeight: 'bold' }}>Model: </Text>{equipmentModel}</Text>
+                        <Text style={{ color: Constant.color.text }}><Text style={{ fontWeight: 'bold' }}>Serial: </Text>{equipmentSerial}</Text>
+                    </View>
+                    <View style={styles.noteView}>
+                        <TextInput
+                            style={styles.noteInput}
+                            value={note}
+                            multiline
+                            onChangeText={text => setNote(text)}
+                            placeholder='Nhập ghi chú kiểm kê tại đây...'
+                        />
+                    </View>
+
+                    <TouchableOpacity
+                        onPress={requestInventory}
+                        style={styles.requestTouch}>
+                        <Text style={styles.requestText}>
+                            Kiểm kê
+                        </Text>
+                    </TouchableOpacity>
+                </ScrollView>
+            </SafeAreaView>
     )
 }
 

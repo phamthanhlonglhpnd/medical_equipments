@@ -4,8 +4,12 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Constant from '../../controller/Constant'
-import PushNotification from "react-native-push-notification";
+import PushNotification from "react-native-push-notification"
 import Loading from '../customs/Loading'
+import StorageManager from '../../controller/StorageManager'
+import { requestErrorAPI } from '../../controller/APIService'
+import { useDispatch } from 'react-redux'
+import { asyncIncrementCount } from '../../store/slice/appSlice'
 
 const ErrorInfoInput = () => {
 
@@ -17,6 +21,7 @@ const ErrorInfoInput = () => {
     const equipmentSerial = route.params?.serial ?? ''
     const [reason, setReason] = useState('')
     const navigation = useNavigation()
+    const dispatch = useDispatch()
 
     useEffect(() => {
         createChannels();
@@ -49,6 +54,7 @@ const ErrorInfoInput = () => {
             'Vui lòng xem chi tiết ở mục thông báo!'
         )
         setReason("");
+        dispatch(asyncIncrementCount())
         navigation.navigate(Constant.nameScreen.Home);
     }
 
@@ -67,56 +73,55 @@ const ErrorInfoInput = () => {
             return
         }
         setIsLoading(true)
-        dispatch(asyncIncrementCount())
         try {
-            let domain = await StorageManager.getData(Constant.keys.domain);
-            await requestErrorAPI(domain, equipmentId, reason);
-            onSuccessed();
+            let domain = await StorageManager.getData(Constant.keys.domain)
+            await requestErrorAPI(domain, equipmentId, reason)
+            onSuccessed()
             setIsLoading(false)
         } catch (error) {
-            Alert.alert('Thông báo', error?.message);
-            onFailed();
+            Alert.alert('Thông báo', error?.message)
+            onFailed()
             setIsLoading(false)
         }
     }
 
     return (
         isLoading ? <Loading /> :
-        <SafeAreaView style={styles.rootView}>
-            <ScrollView>
-                <Text style={styles.name}>
-                    {equipmentName}
-                </Text>
-                <View 
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-evenly',
-                        marginHorizontal: 20,
-                        marginTop: 10
-                    }}
-                >
-                    <Text style={{color: Constant.color.text}}><Text style={{fontWeight: 'bold'}}>Model: </Text>{equipmentModel}</Text>
-                    <Text style={{color: Constant.color.text}}><Text style={{fontWeight: 'bold'}}>Serial: </Text>{equipmentSerial}</Text>
-                </View>
-                <View style={styles.reasonView}>
-                    <TextInput
-                        style={styles.reasonInput}
-                        value={reason}
-                        multiline
-                        onChangeText={text => setReason(text)}
-                        placeholder='Nhập lý do hỏng tại đây...'
-                    />
-                </View>
-
-                <TouchableOpacity
-                    onPress={requestError}
-                    style={styles.requestTouch}>
-                    <Text style={styles.requestText}>
-                        Báo hỏng
+            <SafeAreaView style={styles.rootView}>
+                <ScrollView>
+                    <Text style={styles.name}>
+                        {equipmentName}
                     </Text>
-                </TouchableOpacity>
-            </ScrollView>
-        </SafeAreaView>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-evenly',
+                            marginHorizontal: 20,
+                            marginTop: 10
+                        }}
+                    >
+                        <Text style={{ color: Constant.color.text }}><Text style={{ fontWeight: 'bold' }}>Model: </Text>{equipmentModel}</Text>
+                        <Text style={{ color: Constant.color.text }}><Text style={{ fontWeight: 'bold' }}>Serial: </Text>{equipmentSerial}</Text>
+                    </View>
+                    <View style={styles.reasonView}>
+                        <TextInput
+                            style={styles.reasonInput}
+                            value={reason}
+                            multiline
+                            onChangeText={text => setReason(text)}
+                            placeholder='Nhập lý do hỏng tại đây...'
+                        />
+                    </View>
+
+                    <TouchableOpacity
+                        onPress={requestError}
+                        style={styles.requestTouch}>
+                        <Text style={styles.requestText}>
+                            Báo hỏng
+                        </Text>
+                    </TouchableOpacity>
+                </ScrollView>
+            </SafeAreaView>
     )
 }
 

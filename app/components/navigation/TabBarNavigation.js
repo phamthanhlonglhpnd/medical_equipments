@@ -7,14 +7,16 @@ import Home from '../home/Home';
 import Profile from '../profile/Profile';
 import NotificationList from '../message/NotificationList';
 import Scan from '../scan/Scan';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectCount } from '../../store/slice/appSlice';
+import { resetCount } from '../../store/slice/appSlice'
 
 const Tab = createBottomTabNavigator();
 
 const TabBarNavigation = () => {
 
-    const count = useSelector(selectCount)
+    const count = useSelector(selectCount);
+    const dispatch = useDispatch();
 
     return (
         <Tab.Navigator
@@ -66,6 +68,11 @@ const TabBarNavigation = () => {
                 options={{
                     title: 'Thông báo',
                     tabBarBadge: count
+                }}
+                listeners={{
+                    tabPress: (e) => {
+                        dispatch(resetCount())
+                    },
                 }}
             />
             <Tab.Screen
