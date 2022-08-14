@@ -1,5 +1,4 @@
 import React from 'react'
-import { StyleSheet } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Constant from '../../controller/Constant';
@@ -41,8 +40,8 @@ const TabBarNavigation = () => {
                 tabBarStyle: {
                     backgroundColor: 'white',
                     borderTopWidth: 0,
-                    height: 65,
-                    paddingBottom: 5
+                    height: 60,
+                    paddingBottom: 3
                 },
                 tabBarShowLabel: true,
                 tabBarLabelStyle: {
@@ -82,14 +81,9 @@ const TabBarNavigation = () => {
             <Tab.Screen
                 name={Constant.nameScreen.Profile}
                 component={Profile}
-                options={{
-                    headerShown: false
-                }}
             />
         </Tab.Navigator>
     )
 }
 
 export default TabBarNavigation
-
-const styles = StyleSheet.create({})

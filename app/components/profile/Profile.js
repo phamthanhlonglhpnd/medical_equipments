@@ -47,16 +47,6 @@ const Profile = () => {
         <KeyboardAwareScrollView 
             style={styles.container}
         >
-        <View style={styles.top}>
-            <Text style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-                color: 'black',
-                textAlign: 'center'
-            }}>
-                Thông tin cá nhân
-            </Text>
-        </View>
         <Image
             style={styles.image}
             source={{

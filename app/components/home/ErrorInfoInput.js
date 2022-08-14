@@ -87,21 +87,21 @@ const ErrorInfoInput = () => {
 
     return (
         isLoading ? <Loading /> :
-            <SafeAreaView style={styles.rootView}>
+            <View style={styles.rootView}>
                 <ScrollView>
                     <Text style={styles.name}>
                         {equipmentName}
                     </Text>
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-evenly',
-                            marginHorizontal: 20,
-                            marginTop: 10
-                        }}
-                    >
-                        <Text style={{ color: Constant.color.text }}><Text style={{ fontWeight: 'bold' }}>Model: </Text>{equipmentModel}</Text>
-                        <Text style={{ color: Constant.color.text }}><Text style={{ fontWeight: 'bold' }}>Serial: </Text>{equipmentSerial}</Text>
+                    <View style={styles.number}>
+                        <View style={styles.detail}>
+                            <Text style={styles.title}>Model</Text>
+                            <Text style={styles.value}>{equipmentModel}</Text>
+
+                        </View>
+                        <View style={styles.detail}>
+                            <Text style={styles.title}>Serial</Text>
+                            <Text style={styles.value}>{equipmentSerial}</Text>
+                        </View>
                     </View>
                     <View style={styles.reasonView}>
                         <TextInput
@@ -121,7 +121,7 @@ const ErrorInfoInput = () => {
                         </Text>
                     </TouchableOpacity>
                 </ScrollView>
-            </SafeAreaView>
+            </View>
     )
 }
 
@@ -143,7 +143,8 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
         marginTop: 20,
-        color: Constant.color.text
+        color: Constant.color.text,
+        fontWeight: 'bold'
     },
     reasonTitle: {
         marginTop: 10
@@ -168,5 +169,25 @@ const styles = StyleSheet.create({
         borderRadius: 22,
         alignSelf: 'center',
         marginTop: 30,
+    },
+    number: {
+        backgroundColor: '#FFF4EB',
+        paddingHorizontal: 15,
+        paddingVertical: 15,
+        borderRadius: 20,
+        marginVertical: 10
+    },
+    title: {
+        marginBottom: 8,
+        color: Constant.color.text
+    },
+    value: {
+        fontSize: 16,
+        color: '#323E6D',
+        fontWeight: 'bold'
+    },
+    detail: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     },
 })

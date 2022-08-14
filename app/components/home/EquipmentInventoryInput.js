@@ -17,7 +17,8 @@ const EquipmentInventoryInput = () => {
     const equipmentName = route.params?.name || route.params?.title
     const equipmentModel = route.params?.model ?? ''
     const equipmentSerial = route.params?.serial ?? ''
-    const [note, setNote] = useState('')
+    const equipmentStatus = route.params?.status ?? ''
+    const [note, setNote] = useState(equipmentStatus === 'liquidated' ? 'Thiết bị đã được thanh lý' : '')
     const navigation = useNavigation()
 
     useEffect(() => {
@@ -83,31 +84,42 @@ const EquipmentInventoryInput = () => {
 
     return (
         isLoading ? <Loading /> :
-            <SafeAreaView style={styles.rootView}>
+            <View style={styles.rootView}>
                 <ScrollView>
                     <Text style={styles.name}>
                         {equipmentName}
                     </Text>
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-evenly',
-                            marginHorizontal: 20,
-                            marginTop: 10
-                        }}
-                    >
-                        <Text style={{ color: Constant.color.text }}><Text style={{ fontWeight: 'bold' }}>Model: </Text>{equipmentModel}</Text>
-                        <Text style={{ color: Constant.color.text }}><Text style={{ fontWeight: 'bold' }}>Serial: </Text>{equipmentSerial}</Text>
+                    <View style={styles.number}>
+                        <View style={styles.detail}>
+                            <Text style={styles.title}>Model</Text>
+                            <Text style={styles.value}>{equipmentModel}</Text>
+
+                        </View>
+                        <View style={styles.detail}>
+                            <Text style={styles.title}>Serial</Text>
+                            <Text style={styles.value}>{equipmentSerial}</Text>
+                        </View>
                     </View>
-                    <View style={styles.noteView}>
-                        <TextInput
-                            style={styles.noteInput}
-                            value={note}
-                            multiline
-                            onChangeText={text => setNote(text)}
-                            placeholder='Nhập ghi chú kiểm kê tại đây...'
-                        />
-                    </View>
+                    {
+                        equipmentStatus !== 'liquidated' ?
+                            <View style={styles.noteView}>
+                                <TextInput
+                                    style={styles.noteInput}
+                                    value={note}
+                                    multiline
+                                    onChangeText={text => setNote(text)}
+                                    placeholder='Nhập ghi chú kiểm kê tại đây...'
+                                />
+                            </View> :
+                            <View style={styles.liquidatedView}>
+                                <Text>Ghi chú tự động</Text>
+                                <TextInput
+                                    style={styles.liquidatedInput}
+                                    multiline
+                                    value={note}
+                                />
+                            </View>
+                    }
 
                     <TouchableOpacity
                         onPress={requestInventory}
@@ -117,7 +129,7 @@ const EquipmentInventoryInput = () => {
                         </Text>
                     </TouchableOpacity>
                 </ScrollView>
-            </SafeAreaView>
+            </View>
     )
 }
 
@@ -139,7 +151,8 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
         marginTop: 20,
-        color: Constant.color.text
+        color: Constant.color.text,
+        fontWeight: 'bold'
     },
     noteTitle: {
         marginTop: 10
@@ -164,5 +177,35 @@ const styles = StyleSheet.create({
         borderRadius: 22,
         alignSelf: 'center',
         marginTop: 30,
+    },
+    liquidatedView: {
+        marginTop: 30
+    },
+    liquidatedInput: {
+        backgroundColor: '#E1E1E5',
+        marginTop: 5,
+        borderRadius: 8,
+        height: 50,
+        paddingHorizontal: 10
+    },
+    number: {
+        backgroundColor: '#FFF4EB',
+        paddingHorizontal: 15,
+        paddingVertical: 15,
+        borderRadius: 20,
+        marginVertical: 10
+    },
+    title: {
+        marginBottom: 8,
+        color: Constant.color.text
+    },
+    value: {
+        fontSize: 16,
+        color: '#323E6D',
+        fontWeight: 'bold'
+    },
+    detail: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     },
 })

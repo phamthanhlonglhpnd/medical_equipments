@@ -63,7 +63,8 @@ export default {
         NotificationList: 'NotificationList',
         Scan: 'Scan',
         Equipment_Department: 'Danh sách thiết bị',
-
+        EquipmentInventoryResult: 'Danh sách tìm kiếm thiết bị cần kiểm kê',
+        EquipmentErrorResult: 'Danh sách tìm kiếm thiết bị cần báo hỏng'
     },
     dateFormat: {
         default: 'dd-MM-yyyy',
@@ -90,6 +91,12 @@ export default {
             screen: 'EquipmentList'
         },
         {
+            title: 'Báo hỏng',
+            icon: require('../assets/images/ic_notification.png'),
+            color: '#A3280B',
+            screen: 'ErrorRequest'
+        },
+        {
             title: 'Khoa phòng',
             icon: require('../assets/images/ic_organization.png'),
             color: 'orange',
@@ -106,12 +113,6 @@ export default {
             icon: require('../assets/images/ic_supplies.png'),
             color: '#D3C3C3',
             screen: 'SuppliesList'
-        },
-        {
-            title: 'Báo hỏng',
-            icon: require('../assets/images/ic_notification.png'),
-            color: '#A3280B',
-            screen: 'ErrorRequest'
         },
         {
             title: 'Kiểm kê',
